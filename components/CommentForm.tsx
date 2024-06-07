@@ -1,7 +1,7 @@
 'use client';
 
 import { createCommentAction } from '@/app/reviews/actions';
-import { FormEvent, useState } from 'react';
+import { useFormState } from '@/lib/hooks';
 
 export interface CommentFormProps {
   title: string;
@@ -9,29 +9,11 @@ export interface CommentFormProps {
 }
 
 export default function CommentForm({ slug, title }: CommentFormProps) {
-  const [state, setState] = useState({ loading: false, error: null });
-
-  const handleSumbit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setState((prevState) => ({ ...prevState, loading: true, error: null }));
-
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-
-    const result = await createCommentAction(formData);
-
-    if (result?.isError) {
-      setState((prevState) => ({ ...prevState, loading: false, error: result.message }));
-    } else {
-      form.reset();
-      setState((prevState) => ({ ...prevState, loading: false, }));
-    }
-  };
-
+  const [state, handleSubmit] = useFormState(createCommentAction);
+  console.log(state);
   return (
     <form
-      onSubmit={handleSumbit}
-      // action={createCommentAction}
+      onSubmit={handleSubmit}
       className="border bg-white flex flex-col gap-2 mt-3 px-3 py-3 rounded"
     >
       <p className="pb-1">
@@ -58,7 +40,7 @@ export default function CommentForm({ slug, title }: CommentFormProps) {
           className="border px-2 py-1 rounded w-full"
         />
       </div>
-      {state.error && <p className="text-red-600">{state.error}</p>}
+      {state.error && <p className="text-red-600">{state?.error.message}</p>}
       <button
         type="submit"
         className="bg-orange-800 rounded px-2 py-1 self-center

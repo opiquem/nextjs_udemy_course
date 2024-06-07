@@ -8,7 +8,7 @@ interface Comment {
   postedAt: Date;
 }
 
-type CreateCommentData = Omit<Comment, 'id' | 'postedAt'>;
+export type CreateCommentData = Omit<Comment, 'id' | 'postedAt'>;
 
 export async function createComment({
   slug,

@@ -1,44 +1,38 @@
 'use server';
 
-import { createComment } from '@/lib/comments';
+import { ActionError } from '@/lib/actions';
+import { CreateCommentData, createComment } from '@/lib/comments';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
-export async function createCommentAction(formData: FormData) {
-  const slug = formData.get('slug') as string;
-
-  const commentData = {
-    slug,
+export async function createCommentAction(
+  formData: FormData
+): Promise<undefined | ActionError> {
+  const data: CreateCommentData = {
+    slug: formData.get('slug') as string,
     user: formData.get('user') as string,
     message: formData.get('message') as string,
   };
-
-  const error = validate(formData);
-
+  const error = validate(data);
   if (error) {
-    return { isError: true, message: error.message };
+    return { isError: true, message: error };
   }
-
-  createComment(commentData);
-  revalidatePath(`/reviews/${slug}`);
+  const comment = await createComment(data);
+  revalidatePath(`/reviews/${data.slug}`);
+  redirect(`/reviews/${data.slug}`);
 }
 
-function validate(data: FormData) {
-  const user = data.get('user') as string;
-  const message = data.get('message') as string;
-
-  if (!user) {
-    return { isError: true, message: 'Please enter your name' };
+function validate(data: CreateCommentData): string | undefined {
+  if (!data.user) {
+    return 'Name field is required';
   }
-
-  if (user.length > 50) {
-    return { isError: true, message: 'Name is too long' };
+  if (data.user.length > 50) {
+    return 'Name field cannot be longer than 50 characters';
   }
-
-  if (!message) {
-    return { isError: true, message: 'Please enter your comment' };
+  if (!data.message) {
+    return 'Comment field is required';
   }
-
-  if (message.length > 500) {
-    return { isError: true, message: 'Comment is too long' };
+  if (data.message.length > 500) {
+    return 'Comment field cannot be longer than 500 characters';
   }
 }
