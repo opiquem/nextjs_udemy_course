@@ -8,6 +8,22 @@ interface Comment {
   postedAt: Date;
 }
 
+type CreateCommentData = Omit<Comment, 'id' | 'postedAt'>;
+
+export async function createComment({
+  slug,
+  user,
+  message,
+}: CreateCommentData) {
+  return await db.comment.create({
+    data: {
+      slug,
+      user,
+      message,
+    },
+  });
+}
+
 export async function getComments(slug: string): Promise<Comment[]> {
   return await db.comment.findMany({
     where: { slug },
