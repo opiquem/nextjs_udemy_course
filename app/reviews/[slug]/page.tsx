@@ -59,7 +59,7 @@ export default async function ReviewPage({ params: { slug } }: ReviewPageProps) 
           <ChatBubbleBottomCenterTextIcon className="h-6 w-6" />
           Comments
         </h2>
-        <CommentForm title={review.title} />
+        <CommentForm title={review.title} slug={slug} />
         <CommentList slug={slug} />
       </section>
     </>
