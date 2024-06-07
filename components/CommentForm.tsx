@@ -1,6 +1,7 @@
-import { createComment } from '@/lib/comments';
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { createCommentAction } from '@/app/reviews/actions';
+import { FormEvent, useState } from 'react';
 
 export interface CommentFormProps {
   title: string;
@@ -8,28 +9,36 @@ export interface CommentFormProps {
 }
 
 export default function CommentForm({ slug, title }: CommentFormProps) {
-  async function commentAction(formData: FormData) {
-    'use server';
-    const commentData = {
-      slug,
-      user: formData.get('user') as string,
-      message: formData.get('message') as string,
-    };
+  const [state, setState] = useState({ loading: false, error: null });
 
-    createComment(commentData);
-    revalidatePath(`/reviews/${slug}`);
-    // redirect(`/reviews/${slug}`);
-  }
+  const handleSumbit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setState((prevState) => ({ ...prevState, loading: true, error: null }));
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const result = await createCommentAction(formData);
+
+    if (result?.isError) {
+      setState((prevState) => ({ ...prevState, loading: false, error: result.message }));
+    } else {
+      form.reset();
+      setState((prevState) => ({ ...prevState, loading: false, }));
+    }
+  };
 
   return (
     <form
-      action={commentAction}
+      onSubmit={handleSumbit}
+      // action={createCommentAction}
       className="border bg-white flex flex-col gap-2 mt-3 px-3 py-3 rounded"
     >
       <p className="pb-1">
         Already played <strong>{title}</strong>? Have your say!
       </p>
       <div className="flex">
+        <input type="hidden" name="slug" value={slug} />
         <label htmlFor="userField" className="shrink-0 w-32">
           Your name
         </label>
@@ -49,10 +58,13 @@ export default function CommentForm({ slug, title }: CommentFormProps) {
           className="border px-2 py-1 rounded w-full"
         />
       </div>
+      {state.error && <p className="text-red-600">{state.error}</p>}
       <button
         type="submit"
         className="bg-orange-800 rounded px-2 py-1 self-center
-                   text-slate-50 w-32 hover:bg-orange-700"
+                   text-slate-50 w-32 hover:bg-orange-700
+                   disabled:bg-slate-500 disabled:text-slate-200 disabled:cursor-not-allowed"
+        disabled={state.loading}
       >
         Submit
       </button>
