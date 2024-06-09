@@ -1,12 +1,14 @@
-import type { Metadata } from 'next';
-import { ChatBubbleBottomCenterTextIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
 import CommentForm from '@/components/CommentForm';
 import CommentList from '@/components/CommentList';
+import CommentListSkeleton from '@/components/CommentListSkeleton';
 import Heading from '@/components/Heading';
 import ShareLinkButton from '@/components/ShareLinkButton';
 import { getReview, getSlugs } from '@/lib/reviews';
+import { ChatBubbleBottomCenterTextIcon } from '@heroicons/react/24/outline';
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 interface ReviewPageParams {
   slug: string;
@@ -22,7 +24,9 @@ export async function generateStaticParams(): Promise<ReviewPageParams[]> {
   return slugs.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params: { slug } }: ReviewPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params: { slug },
+}: ReviewPageProps): Promise<Metadata> {
   const review = await getReview(slug);
   if (!review) {
     notFound();
@@ -32,7 +36,9 @@ export async function generateMetadata({ params: { slug } }: ReviewPageProps): P
   };
 }
 
-export default async function ReviewPage({ params: { slug } }: ReviewPageProps) {
+export default async function ReviewPage({
+  params: { slug },
+}: ReviewPageProps) {
   console.log('[ReviewPage] rendering', slug);
   const review = await getReview(slug);
   if (!review) {
@@ -41,17 +47,21 @@ export default async function ReviewPage({ params: { slug } }: ReviewPageProps) 
   return (
     <>
       <Heading>{review.title}</Heading>
-      <p className="font-semibold pb-3">
-        {review.subtitle}
-      </p>
+      <p className="font-semibold pb-3">{review.subtitle}</p>
       <div className="flex gap-3 items-baseline">
         <p className="italic pb-2">{review.date}</p>
         <ShareLinkButton />
       </div>
-      <Image src={review.image} alt="" priority
-        width="640" height="360" className="mb-2 rounded"
+      <Image
+        src={review.image}
+        alt=""
+        priority
+        width="640"
+        height="360"
+        className="mb-2 rounded"
       />
-      <article dangerouslySetInnerHTML={{ __html: review.body }}
+      <article
+        dangerouslySetInnerHTML={{ __html: review.body }}
         className="max-w-screen-sm prose prose-slate"
       />
       <section className="border-dashed border-t max-w-screen-sm mt-3 py-3">
@@ -60,7 +70,9 @@ export default async function ReviewPage({ params: { slug } }: ReviewPageProps) 
           Comments
         </h2>
         <CommentForm title={review.title} slug={slug} />
-        <CommentList slug={slug} />
+        <Suspense fallback={<CommentListSkeleton />}>
+          <CommentList slug={slug} />
+        </Suspense>
       </section>
     </>
   );
