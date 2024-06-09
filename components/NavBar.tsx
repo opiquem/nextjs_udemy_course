@@ -19,6 +19,11 @@ export default function NavBar() {
             About
           </NavLink>
         </li>
+        <li>
+          <NavLink href="/sign-in" prefetch={false}>
+            Sign-in
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );

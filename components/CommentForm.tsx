@@ -10,7 +10,7 @@ export interface CommentFormProps {
 
 export default function CommentForm({ slug, title }: CommentFormProps) {
   const [state, handleSubmit] = useFormState(createCommentAction);
-  console.log(state);
+
   return (
     <form
       onSubmit={handleSubmit}
