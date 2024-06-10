@@ -1,19 +1,16 @@
 'use server';
 
 import { ActionError } from '@/lib/actions';
-import { authenticateUser } from '@/lib/users';
+import { CreateUserData, createUser } from '@/lib/users';
 import { redirect } from 'next/navigation';
-import {
-  SignInData,
-  deleteSessionToken,
-  setSessionToken,
-} from '../../lib/auth';
+import { setSessionToken } from '../../lib/auth';
 
-export async function signInAction(
+export async function signUpAction(
   formData: FormData
 ): Promise<undefined | ActionError> {
-  const registerData: SignInData = {
+  const registerData: CreateUserData = {
     email: formData.get('email') as string,
+    name: formData.get('name') as string,
     password: formData.get('password') as string,
   };
 
@@ -22,19 +19,22 @@ export async function signInAction(
   if (error) {
     return { isError: true, message: error };
   }
+  try {
+    const user = await createUser(registerData);
 
-  const user = await authenticateUser(registerData);
+    if (!user) {
+      return { isError: true, message: 'Something went wrong' };
+    }
 
-  if (!user) {
-    return { isError: true, message: 'Invalid email or password' };
+    await setSessionToken(user);
+  } catch (error) {
+    return { isError: true, message: 'User with this email already exists' };
   }
-
-  await setSessionToken(user);
 
   redirect('/');
 }
 
-function validate(data: SignInData): string | undefined {
+function validate(data: CreateUserData): string | undefined {
   if (!data.email) {
     return 'Email field is required';
   }
@@ -47,9 +47,10 @@ function validate(data: SignInData): string | undefined {
   if (data.password.length > 50) {
     return 'Comment field cannot be longer than 50 characters';
   }
-}
-
-export async function signOut() {
-  deleteSessionToken();
-  redirect('/');
+  if (data.name.length > 50) {
+    return 'Name field cannot be longer than 50 characters';
+  }
+  if (!data.name) {
+    return 'Name field is required';
+  }
 }

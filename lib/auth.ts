@@ -8,7 +8,9 @@ export interface SignInData {
 }
 
 export interface AuthenticatedUser {
+  id?: string;
   email: string;
+  name?: string;
 }
 
 export async function signIn(data: SignInData) {
@@ -21,7 +23,7 @@ export async function getUserFromSession(): Promise<AuthenticatedUser> {
   if (sessionToken) {
     try {
       const { payload } = await jwtVerify<AuthenticatedUser>(
-        sessionToken ,
+        sessionToken,
         config.JWT_SECRET
       );
 
@@ -47,8 +49,8 @@ export async function generateJWT(user: AuthenticatedUser) {
   return sessionToken;
 }
 
-export async function setSessionToken(user) {
-  const sessionToken = await generateJWT(user);
+export async function setSessionToken({ id, email, name }: AuthenticatedUser) {
+  const sessionToken = await generateJWT({ id, email, name });
   cookies().set(config.JWT_SESSION, sessionToken, {
     expires: config.EXPIRATION_DATE,
     httpOnly: true,

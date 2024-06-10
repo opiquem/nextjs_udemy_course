@@ -1,3 +1,4 @@
+import { SignInData } from './auth';
 import { db } from './db';
 
 interface User {
@@ -8,6 +9,15 @@ interface User {
 }
 
 export type CreateUserData = Omit<User, 'id'>;
+
+export async function authenticateUser({ email, password }: SignInData) {
+  return await db.user.findUnique({
+    where: {
+      email,
+      password,
+    },
+  });
+}
 
 export async function createUser({ email, name, password }: CreateUserData) {
   return await db.user.create({

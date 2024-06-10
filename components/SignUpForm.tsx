@@ -1,18 +1,21 @@
 'use client';
 
-import { signInAction } from '@/app/sign-in/actions';
+import { signUpAction } from '@/app/sign-up/actions';
 import { useFormState } from '@/lib/hooks';
 import NavLink from './NavLink';
 
-export default function SignInForm() {
-  const [state, handleSubmit] = useFormState(signInAction);
+export default function SignUpForm() {
+  const [state, handleSubmit] = useFormState(signUpAction);
 
   return (
     <form
       onSubmit={handleSubmit}
       className="border bg-white flex flex-col gap-2 mt-3 px-3 py-3 rounded"
     >
-      <NavLink href="/sign-up">Don&apos;t have an account? Sign up</NavLink>
+      <NavLink href='/sign-in'>
+        Already have an account? Sign in
+      </NavLink>
+
       <div className="flex items-center">
         <label htmlFor="emailField" className="shrink-0 w-32">
           Your email
@@ -22,6 +25,17 @@ export default function SignInForm() {
           id="emailField"
           className="border px-2 py-1 rounded w-80"
           type="email"
+        />
+      </div>
+      <div className="flex items-center">
+        <label htmlFor="emailField" className="shrink-0 w-32">
+          Your name
+        </label>
+        <input
+          name="name"
+          id="nameField"
+          className="border px-2 py-1 rounded w-80"
+          type="text"
         />
       </div>
       <div className="flex items-center">
