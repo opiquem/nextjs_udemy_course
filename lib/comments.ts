@@ -1,32 +1,44 @@
 import { db } from './db';
+import { User } from './users';
 
 interface Comment {
   id: string;
   slug: string;
-  user: string;
+  userId: string;
   message: string;
   postedAt: Date;
 }
 
-export type CreateCommentData = Omit<Comment, 'id' | 'postedAt'>;
+interface CommentWithUser extends Comment {
+  user: Pick<User, 'name'>;
+}
+
+export type CreateCommentData = Omit<Comment, 'id' | 'postedAt' | 'user'> & {
+  userId: string;
+};
 
 export async function createComment({
   slug,
-  user,
+  userId,
   message,
 }: CreateCommentData) {
   return await db.comment.create({
     data: {
       slug,
-      user,
+      userId,
       message,
     },
   });
 }
 
-export async function getComments(slug: string): Promise<Comment[]> {
+export async function getComments(slug: string): Promise<CommentWithUser[]> {
   return await db.comment.findMany({
     where: { slug },
     orderBy: { postedAt: 'desc' },
+    include: {
+      user: {
+        select: { name: true },
+      },
+    },
   });
 }

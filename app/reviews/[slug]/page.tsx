@@ -8,6 +8,7 @@ import { getReview, getSlugs } from '@/lib/reviews';
 import { ChatBubbleBottomCenterTextIcon } from '@heroicons/react/24/outline';
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -72,8 +73,15 @@ export default async function ReviewPage({
           <ChatBubbleBottomCenterTextIcon className="h-6 w-6" />
           Comments
         </h2>
-        {user && (
+        {user ? (
           <CommentForm title={review.title} slug={slug} userName={user.name} />
+        ) : (
+          <p className="italic">
+            <Link className="text-orange-800 hover:underline" href="/sign-in">
+              Sign in
+            </Link>{' '}
+            to leave a comment
+          </p>
         )}
         <Suspense fallback={<CommentListSkeleton />}>
           <CommentList slug={slug} />

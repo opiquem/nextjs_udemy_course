@@ -22,7 +22,6 @@ export default function CommentForm({ slug, title, userName }: CommentFormProps)
       </p>
       <div className="flex">
         <input type="hidden" name="slug" value={slug} />
-        <input type="hidden" name="user" value={userName} />
         <label htmlFor="userField" className="shrink-0 w-32">
           Your name
         </label>

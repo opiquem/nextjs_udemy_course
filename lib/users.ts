@@ -2,14 +2,16 @@ import { compare, hash } from 'bcrypt';
 import { SignInData } from './auth';
 import { db } from './db';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   name: string;
-  password: string;
+  passwordHash: string;
 }
 
-export type CreateUserData = Omit<User, 'id'>;
+export interface CreateUserData extends Omit<User, 'id' | 'passwordHash'> {
+  password: string;
+}
 
 export async function authenticateUser({ email, password }: SignInData) {
   const user = await db.user.findUnique({

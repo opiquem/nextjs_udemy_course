@@ -16,7 +16,7 @@ export default async function CommentList({ slug }) {
         >
           <div className="flex gap-3 pb-1 text-slate-500">
             <UserCircleIcon className="h-6 w-6" />
-            {comment.user}
+            {comment.user.name}
           </div>
           <p className="italic">{comment.message}</p>
         </li>
