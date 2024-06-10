@@ -1,13 +1,13 @@
 import { AuthenticatedUser, getUserFromSession } from '@/lib/auth';
 import NavLink from './NavLink';
+import { SignOutButton } from './SignOutButton';
 
 export default async function NavBar() {
   const user: AuthenticatedUser = await getUserFromSession();
-  console.log(user);
 
   return (
     <nav>
-      <ul className="flex gap-2">
+      <ul className="flex gap-2 items-center">
         <li className="font-bold font-orbitron">
           <NavLink href="/">Indie Gamer</NavLink>
         </li>
@@ -21,7 +21,7 @@ export default async function NavBar() {
         </li>
         <li>
           {user ? (
-            <span className="text-orange-800">{user.email}</span>
+            <SignOutButton />
           ) : (
             <NavLink href="/sign-in" prefetch={false}>
               Sign-in

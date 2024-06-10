@@ -2,7 +2,7 @@
 
 import { ActionError } from '@/lib/actions';
 import { redirect } from 'next/navigation';
-import { SignInData, authenticate, setSessionToken } from '../../lib/auth';
+import { SignInData, authenticate, deleteSessionToken, setSessionToken } from '../../lib/auth';
 
 export async function signInAction(
   formData: FormData
@@ -42,4 +42,9 @@ function validate(data: SignInData): string | undefined {
   if (data.password.length > 50) {
     return 'Comment field cannot be longer than 50 characters';
   }
+}
+
+export async function signOut() {
+  deleteSessionToken();
+  redirect('/');
 }
