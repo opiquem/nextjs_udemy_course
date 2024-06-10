@@ -6,3 +6,7 @@ export interface SignInData {
 export async function signIn(data: SignInData) {
   return await console.log('signIn', data);
 }
+
+export interface AuthenticatedUser {
+  email: string;
+}
