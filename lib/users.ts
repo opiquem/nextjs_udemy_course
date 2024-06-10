@@ -1,3 +1,4 @@
+import { compare, hash } from 'bcrypt';
 import { SignInData } from './auth';
 import { db } from './db';
 
@@ -11,20 +12,25 @@ interface User {
 export type CreateUserData = Omit<User, 'id'>;
 
 export async function authenticateUser({ email, password }: SignInData) {
-  return await db.user.findUnique({
+  const user = await db.user.findUnique({
     where: {
       email,
-      password,
     },
   });
+
+  if (user && (await compare(password, user.passwordHash))) {
+    return user;
+  }
 }
 
 export async function createUser({ email, name, password }: CreateUserData) {
+  const passwordHash = await hash(password, 10);
+
   return await db.user.create({
     data: {
       email,
       name,
-      password,
+      passwordHash,
     },
   });
 }
