@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 import { config } from './config';
 
 export interface SignInData {
@@ -17,20 +18,24 @@ export async function signIn(data: SignInData) {
   return await console.log('signIn', data);
 }
 
-export async function getUserFromSession(): Promise<AuthenticatedUser> {
+const decodeSessionToken = cache(async (sessionToken: string) => {
+  try {
+    const { payload } = await jwtVerify<AuthenticatedUser>(
+      sessionToken,
+      config.JWT_SECRET
+    );
+
+    return payload;
+  } catch (error) {
+    console.warn('Invalid JWT', error);
+  }
+});
+
+export function getUserFromSession(): Promise<AuthenticatedUser | undefined> {
   const sessionToken = cookies().get(config.JWT_SESSION)?.value;
 
   if (sessionToken) {
-    try {
-      const { payload } = await jwtVerify<AuthenticatedUser>(
-        sessionToken,
-        config.JWT_SECRET
-      );
-
-      return payload;
-    } catch (error) {
-      console.warn('Invalid JWT', error);
-    }
+   return decodeSessionToken(sessionToken);
   }
 }
 
