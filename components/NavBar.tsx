@@ -1,12 +1,9 @@
-import { AuthenticatedUser } from '@/lib/users';
-import { cookies } from 'next/headers';
+import { AuthenticatedUser, getUserFromSession } from '@/lib/auth';
 import NavLink from './NavLink';
 
-export default function NavBar() {
-  const userCookie = cookies().get('user');
-  const user: AuthenticatedUser = userCookie
-    ? JSON.parse(userCookie.value)
-    : null;
+export default async function NavBar() {
+  const user: AuthenticatedUser = await getUserFromSession();
+  console.log(user);
 
   return (
     <nav>
