@@ -8,9 +8,9 @@ export interface SignInData {
 }
 
 export interface AuthenticatedUser {
-  id?: string;
+  id: string;
   email: string;
-  name?: string;
+  name: string;
 }
 
 export async function signIn(data: SignInData) {

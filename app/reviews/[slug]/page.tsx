@@ -3,6 +3,7 @@ import CommentList from '@/components/CommentList';
 import CommentListSkeleton from '@/components/CommentListSkeleton';
 import Heading from '@/components/Heading';
 import ShareLinkButton from '@/components/ShareLinkButton';
+import { AuthenticatedUser, getUserFromSession } from '@/lib/auth';
 import { getReview, getSlugs } from '@/lib/reviews';
 import { ChatBubbleBottomCenterTextIcon } from '@heroicons/react/24/outline';
 import type { Metadata } from 'next';
@@ -20,7 +21,7 @@ interface ReviewPageProps {
 
 export async function generateStaticParams(): Promise<ReviewPageParams[]> {
   const slugs = await getSlugs();
-  // console.log('[ReviewPage] generateStaticParams:', slugs);
+
   return slugs.map((slug) => ({ slug }));
 }
 
@@ -39,11 +40,13 @@ export async function generateMetadata({
 export default async function ReviewPage({
   params: { slug },
 }: ReviewPageProps) {
-  console.log('[ReviewPage] rendering', slug);
   const review = await getReview(slug);
   if (!review) {
     notFound();
   }
+
+  const user: AuthenticatedUser = await getUserFromSession();
+
   return (
     <>
       <Heading>{review.title}</Heading>
@@ -69,7 +72,9 @@ export default async function ReviewPage({
           <ChatBubbleBottomCenterTextIcon className="h-6 w-6" />
           Comments
         </h2>
-        <CommentForm title={review.title} slug={slug} />
+        {user && (
+          <CommentForm title={review.title} slug={slug} userName={user.name} />
+        )}
         <Suspense fallback={<CommentListSkeleton />}>
           <CommentList slug={slug} />
         </Suspense>

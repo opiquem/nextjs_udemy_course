@@ -6,9 +6,10 @@ import { useFormState } from '@/lib/hooks';
 export interface CommentFormProps {
   title: string;
   slug: string;
+  userName: string;
 }
 
-export default function CommentForm({ slug, title }: CommentFormProps) {
+export default function CommentForm({ slug, title, userName }: CommentFormProps) {
   const [state, handleSubmit] = useFormState(createCommentAction);
 
   return (
@@ -21,14 +22,11 @@ export default function CommentForm({ slug, title }: CommentFormProps) {
       </p>
       <div className="flex">
         <input type="hidden" name="slug" value={slug} />
+        <input type="hidden" name="user" value={userName} />
         <label htmlFor="userField" className="shrink-0 w-32">
           Your name
         </label>
-        <input
-          name="user"
-          id="userField"
-          className="border px-2 py-1 rounded w-48"
-        />
+        <span>{userName}</span>
       </div>
       <div className="flex">
         <label htmlFor="messageField" className="shrink-0 w-32">
